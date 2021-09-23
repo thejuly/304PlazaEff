@@ -92,7 +92,7 @@ router.get('/stream', function(req, res) {
   // Timeout timer, send a comment line every 20 sec
   var timer = setInterval(function() {
     eventEmitter.emit('start');
-  }, 2000);
+  }, 5000);
 
 
 });

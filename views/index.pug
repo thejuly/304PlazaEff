@@ -1,0 +1,109 @@
+extends layout
+
+block content
+  .container.panel.panel-default
+    //- li #{hist}
+    //- li #{hist[0].level}
+    
+    //- each histx in hist 
+      //- li=histx.level 
+      //- li=histx.pump
+
+
+    .col-md-6
+      h3 304 Plaza Effluent
+      div.container1.col-md-12
+        div.item1
+          ul.tagItem Level (%)
+          ul#tag1 Waiting Data
+      div.container1.col-md-12
+        div.item1
+          ul.tagItem Pump
+          ul#tag2 Waiting Data
+
+
+    dev.
+      <canvas id="myChart"></canvas>
+
+    .col-md-6
+      h3 Info
+      ul.list-group
+        li.list-group-item Auth: THongpoon_0684
+        li.list-group-item Site: 304Plaza Eff.
+        li.list-group-item Copyright: @2021
+
+
+
+
+
+    script.
+      var hist = !{JSON.stringify(hist)};
+      const level = hist.map((hist) => {
+        return hist.level;
+      })
+      const pump = hist.map((hist) => {
+        return hist.pump;
+      })
+      const stamp = hist.map((hist) => {
+        return hist.stamp;
+      })
+      
+      var ctx = document.getElementById('myChart');
+      var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: stamp,
+              datasets: [{
+                  label: 'Level',
+                  data: level,
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255, 99, 132, 1)'
+                  ],
+                  borderWidth: 1
+              },
+              {
+                  label: 'Pump',
+                  data: pump,
+                  backgroundColor: [
+                      'rgba(54, 162, 235, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(54, 162, 235, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+      
+
+
+    script.
+      var tag_1 = document.getElementById("tag1");
+      var tag_2 = document.getElementById("tag2");
+
+      var es = new EventSource('/stream');
+      es.onerror = function(e)  { console.error(e); };
+      es.onopen = function(e) { console.log("Open", e);};
+
+      es.onmessage = function(e) {
+        //- console.log("Mesage:", e);
+        //- console.log(e.data); //myScript (see console log in inspect browser)
+
+        var json = JSON.parse(e.data);
+
+
+        tag_1.innerHTML = (json[0].euVal.toFixed(2));
+        tag_2.innerHTML = (json[1].euVal);
+
+      };
+      
